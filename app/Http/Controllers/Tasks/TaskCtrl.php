@@ -15,6 +15,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
+use App\Methods\ProjectMethod;
 
 class TaskCtrl extends ApiCtrl
 {
@@ -35,8 +36,7 @@ class TaskCtrl extends ApiCtrl
             $this->notFound404('sprint');
         }
 
-        $check = $this->authUserForProject($request->user->id, $sprint->project_id);
-        if ($check->update != 1) {
+        if (ProjectMethod::authUserForProject($request->user->id, $sprint->project_id) != 1) {
             abort(403);
         }
 
@@ -106,9 +106,8 @@ class TaskCtrl extends ApiCtrl
         if(empty($task)){
             $this->notFound404('task');
         }
-        $check = $this->authUserForProject($request->user->id,$task->project_id);
-        if(is_null($check) || $check->update !== 1){
-            abort(403);
+        if(ProjectMethod::authUserForProject($request->user->id, $task->project_id) !== 1){
+            $this->noPermission('no permission');
         }
         $member = User::rightJoin('project_users as pu', 'pu.user_id', '=' , 'users.id')
             ->leftjoin('roles', 'roles.id', '=' ,'pu.role_id')
@@ -142,8 +141,7 @@ class TaskCtrl extends ApiCtrl
             $this->notFound404('task');
         }
 
-        $check = $this->authUserForProject($request->user->id, $task->project_id);
-        if ($check->update != 1) {
+        if (ProjectMethod::authUserForProject($request->user->id, $task->project_id) != 1) {
             abort(403);
         }
         $title = Input::get('title', null);
@@ -222,8 +220,7 @@ class TaskCtrl extends ApiCtrl
             $this->notFound404('task');
         }
 
-        $check = $this->authUserForProject($request->user->id, $task->project_id);
-        if ($check->update != 1) {
+        if (ProjectMethod::authUserForProject($request->user->id, $task->project_id) != 1) {
             abort(403);
         }
 

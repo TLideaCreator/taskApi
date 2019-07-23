@@ -22,12 +22,6 @@ $api->version('v1', function ($api) {
         $api->get('/latest/time', 'ProjectCtrl@getLastProjectList');
         $api->post('/', 'ProjectCtrl@createProject');
         $api->get('/{projectId}', 'ProjectCtrl@projectDetail');
-        $api->patch('/{projectId}', 'ProjectCtrl@updateProject');
-        $api->delete('/{projectId}', 'ProjectCtrl@removeProject');
-
-        $api->get('/{projectId}/members', 'ProjectMemberCtrl@getProjectMemberList');
-        $api->post('/{projectId}/members/{memberId}/roles/{roleId}', 'ProjectMemberCtrl@addMemberToProject');
-        $api->delete('/{projectId}/members/{memberId}', 'ProjectMemberCtrl@delProjectMembers');
     });
 
     $api->group(['middleware' => 'auth', 'namespace' => 'App\Http\Controllers\User'], function ($api) {
@@ -36,10 +30,6 @@ $api->version('v1', function ($api) {
         $api->get('/users/{userId}', 'UserCtrl@getUserDetail');
         $api->patch('/users/{userId}', 'UserCtrl@updateUser');
         $api->delete('/users/{userId}', 'UserCtrl@deleteUser');
-    });
-
-    $api->group(['prefix'=>'system','middleware'=>'auth', 'namespace'=> 'App\Http\Controllers\System'],function ($api){
-        $api->get('template', 'SystemCtrl@getSystemTemplate');
     });
 
     $api->group(['prefix'=>'projects','middleware'=>'auth', 'namespace'=> 'App\Http\Controllers\Sprints'], function ($api){
@@ -55,4 +45,63 @@ $api->version('v1', function ($api) {
         $api->patch('/tasks/{taskId}/movement/sprints/{sprintId}', 'TaskCtrl@moveTaskToSprint');
 
     });
+
+    $api->group(['prefix'=>'system', 'middleware'=>['auth','sys_auth'], 'namespace'=> 'App\Http\Controllers\SystemTemp'] , function ($api){
+        $api->get('template', 'SystemTempCtrl@getSystemTemplate');
+        $api->post('template', 'SystemTempCtrl@createSystemTemplate');
+        $api->get('template/{tempId}', 'SystemTempCtrl@getSystemTemplate');
+        $api->patch('template/{tempId}', 'SystemTempCtrl@updateSystemTemplate');
+        $api->delete('template/{tempId}', 'SystemTempCtrl@deleteSystemTemplate');
+
+        $api->get('template/{tempId}/roles', 'SystemTempRoleCtrl@getSystemTemplateRole');
+        $api->post('template/{tempId}/roles', 'SystemTempRoleCtrl@createSystemTemplateRole');
+        $api->patch('template/{tempId}/roles/{roleId}', 'SystemTempRoleCtrl@updateSystemTemplateRole');
+        $api->delete('template/{tempId}/roles/{roleId}', 'SystemTempRoleCtrl@deleteSystemTemplateRole');
+
+        $api->get('template/{tempId}/status', 'SystemTempStatusCtrl@getSystemTemplateStatus');
+        $api->post('template/{tempId}/status', 'SystemTempStatusCtrl@createSystemTemplateStatus');
+        $api->patch('template/{tempId}/status/{statusId}', 'SystemTempStatusCtrl@updateSystemTemplateStatus');
+        $api->delete('template/{tempId}/status/{statusId}', 'SystemTempStatusCtrl@deleteSystemTemplateStatus');
+
+        $api->get('template/{tempId}/types', 'SystemTempTypeCtrl@getSystemTemplateTypes');
+        $api->post('template/{tempId}/types', 'SystemTempTypeCtrl@createSystemTemplateTypes');
+        $api->patch('template/{tempId}/types/{statusId}', 'SystemTempTypeCtrl@updateSystemTemplateTypes');
+        $api->delete('template/{tempId}/types/{statusId}', 'SystemTempTypeCtrl@deleteSystemTemplateTypes');
+
+        $api->get('template/{tempId}/priorities', 'SystemTempPriorityCtrl@getSystemTemplatePriority');
+        $api->post('template/{tempId}/priorities', 'SystemTempPriorityCtrl@createSystemTemplatePriority');
+        $api->patch('template/{tempId}/priorities/{priorityId}', 'SystemTempPriorityCtrl@updateSystemTemplatePriority');
+        $api->delete('template/{tempId}/priorities/{priorityId}', 'SystemTempPriorityCtrl@deleteSystemTemplatePriority');
+    });
+
+    $api->group(['prefix'=>'projects/{projectId}', 'middleware'=>['auth','project_auth'], 'namespace'=> 'App\Http\Controllers\Projects'] , function ($api){
+        $api->patch('', 'ProjectCtrl@updateProject');
+        $api->delete('', 'ProjectCtrl@removeProject');
+
+        $api->get('/members', 'ProjectMemberCtrl@getProjectMemberList');
+        $api->post('/members/{memberId}/roles/{roleId}', 'ProjectMemberCtrl@addMemberToProject');
+        $api->delete('/members/{memberId}', 'ProjectMemberCtrl@delProjectMembers');
+
+        $api->get('/setting/{tempId}/roles', 'SystemTempRoleCtrl@getSystemTemplateRole');
+        $api->post('/setting/{tempId}/roles', 'SystemTempRoleCtrl@createSystemTemplateRole');
+        $api->patch('/setting/{tempId}/roles/{roleId}', 'SystemTempRoleCtrl@updateSystemTemplateRole');
+        $api->delete('/setting/{tempId}/roles/{roleId}', 'SystemTempRoleCtrl@deleteSystemTemplateRole');
+
+        $api->get('/setting/{tempId}/status', 'SystemTempStatusCtrl@getSystemTemplateStatus');
+        $api->post('/setting/{tempId}/status', 'SystemTempStatusCtrl@createSystemTemplateStatus');
+        $api->patch('/setting/{tempId}/status/{statusId}', 'SystemTempStatusCtrl@updateSystemTemplateStatus');
+        $api->delete('/setting/{tempId}/status/{statusId}', 'SystemTempStatusCtrl@deleteSystemTemplateStatus');
+
+        $api->get('/setting/{tempId}/types', 'SystemTempTypeCtrl@getSystemTemplateTypes');
+        $api->post('/setting/{tempId}/types', 'SystemTempTypeCtrl@createSystemTemplateTypes');
+        $api->patch('/setting/{tempId}/types/{statusId}', 'SystemTempTypeCtrl@updateSystemTemplateTypes');
+        $api->delete('/setting/{tempId}/types/{statusId}', 'SystemTempTypeCtrl@deleteSystemTemplateTypes');
+
+        $api->get('/setting/{tempId}/priorities', 'SystemTempPriorityCtrl@getSystemTemplatePriority');
+        $api->post('/setting/{tempId}/priorities', 'SystemTempPriorityCtrl@createSystemTemplatePriority');
+        $api->patch('/setting/{tempId}/priorities/{priorityId}', 'SystemTempPriorityCtrl@updateSystemTemplatePriority');
+        $api->delete('/setting/{tempId}/priorities/{priorityId}', 'SystemTempPriorityCtrl@deleteSystemTemplatePriority');
+
+    });
+
 });

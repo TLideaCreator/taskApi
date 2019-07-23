@@ -5,7 +5,6 @@ namespace App\Models;
 
 
 use Faker\Provider\Uuid;
-use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Model;
 
 abstract  class TM extends Model

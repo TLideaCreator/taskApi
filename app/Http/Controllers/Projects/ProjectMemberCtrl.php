@@ -9,6 +9,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Methods\ProjectMethod;
 
 class ProjectMemberCtrl extends ApiCtrl
 {
@@ -16,8 +17,7 @@ class ProjectMemberCtrl extends ApiCtrl
     public function getProjectMemberList(Request $request, $projectId)
     {
         $user = $request->user;
-        $check = $this->authUserForProject($user->id, $projectId);
-        if(empty($check) || $check->read != 1){
+        if(ProjectMethod::authUserForProject($user->id, $projectId) != 1){
             $this->noPermission('project member');
         }
         return $this->projectMemberList($projectId);
@@ -26,8 +26,7 @@ class ProjectMemberCtrl extends ApiCtrl
     public function addMemberToProject(Request $request, $projectId, $memberId, $roleId)
     {
         $user = $request->user;
-        $check = $this->authUserForProject($user->id, $projectId);
-        if(empty($check) || $check->create != 1){
+        if(ProjectMethod::authUserForProject($user->id, $projectId) != 1){
             $this->noPermission('project member');
         }
 
@@ -69,8 +68,7 @@ class ProjectMemberCtrl extends ApiCtrl
     public function delProjectMembers(Request $request, $projectId, $memberId)
     {
         $user = $request->user;
-        $check = $this->authUserForProject($user->id, $projectId);
-        if(empty($check) || $check->create != 1){
+        if(ProjectMethod::authUserForProject($user->id, $projectId) != 1){
             abort(403);
         }
         DB::table('project_users')

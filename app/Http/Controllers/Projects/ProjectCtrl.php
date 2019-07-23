@@ -6,23 +6,16 @@ namespace App\Http\Controllers\Projects;
 
 use App\Format\ProjectFormat;
 use App\Http\Controllers\ApiCtrl;
+use App\Methods\ProjectMethod;
 use App\Models\Project;
-use App\Models\ProjectTaskPriority;
-use App\Models\ProjectTaskStatus;
-use App\Models\ProjectTaskType;
 use App\Models\Sprint;
-use App\Models\SystemTaskPriority;
-use App\Models\SystemTaskStatus;
 use App\Models\SystemTaskTemp;
-use App\Models\SystemTaskType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 
 class ProjectCtrl extends ApiCtrl
 {
-
-
     /**
      * ProjectCtrl constructor.
      */
@@ -108,31 +101,25 @@ class ProjectCtrl extends ApiCtrl
                 'cur_sprint_id' => '',
                 'desc' => $desc
             ]);
-            $status = SystemTaskStatus::where('temp_id', $tempId)->get();
-            foreach ($status as $item) {
-                $item->project_id = $project->id;
-                unset($item->temp_id);
-                ProjectTaskStatus::create(json_decode(json_encode($item), true));
-            }
+            DB::insert('
+                insert into project_task_priorities (id, project_id, name, color, is_default)
+                select uuid(), ? ,name , color, is_default from system_task_priorities where temp_id= ?;',
+                [$project->id, $tempId]);
+            DB::insert('insert into project_task_status (id, project_id, name, indexes, type)
+                select uuid() , ? , name , indexes, type from system_task_status where temp_id = ?;',
+                [$project->id, $tempId]);
+            DB::insert('insert into project_task_roles (id, project_id, name, logo, project_mgr, sprint_mgr, task_mgr)
+                select uuid() , ? , name, logo, project_mgr, sprint_mgr, task_mgr from system_task_roles where temp_id = ?',
+                [$project->id, $tempId]);
+            DB::insert('insert into project_task_types (id, project_id, name, icon)
+                select uuid() , ? , name , icon from system_task_types where temp_id = ?;',
+                [$project->id, $tempId]);
 
-            $priorities = SystemTaskPriority::where('temp_id', $tempId)->get();
-            foreach ($priorities as $priority) {
-                $priority->project_id = $project->id;
-                unset($priority->temp_id);
-                ProjectTaskPriority::create(json_decode(json_encode($priority), true));
-            }
-
-            $types = SystemTaskType::where('temp_id', $tempId)->get();
-            foreach ($types as $type) {
-                $type->project_id = $project->id;
-                unset($type->temp_id);
-                ProjectTaskType::create(json_decode(json_encode($type), true));
-            }
 
             DB::table('project_users')->insert([
                 'project_id' => $project->id,
                 'user_id' => $user->id,
-                'role_id' => DB::table('roles')->where('type', 1)->value('id')
+                'role_id' => DB::table('project_task_roles')->where('project_mgr', 1)->value('id')
             ]);
             Sprint::create([
                 'name_index' => 0,
@@ -149,8 +136,7 @@ class ProjectCtrl extends ApiCtrl
     {
         $user = $request->user;
 
-        $check = $this->authUserForProject($user->id, $projectId);
-        if (empty($check) || $check->delete != 1) {
+        if (ProjectMethod::authUserForProject($user->id, $projectId) != 1) {
             abort(403);
         }
 
@@ -174,8 +160,7 @@ class ProjectCtrl extends ApiCtrl
     public function removeProject(Request $request, $projectId)
     {
         $user = $request->user;
-        $check = $this->authUserForProject($user->id, $projectId);
-        if (empty($check) || $check->delete != 1) {
+        if (ProjectMethod::authUserForProject($user->id, $projectId) != 1) {
             abort(403);
         }
         $project = Project::where('id', $projectId)->first();
@@ -187,8 +172,7 @@ class ProjectCtrl extends ApiCtrl
     public function projectDetail(Request $request, $projectId)
     {
         $user = $request->user;
-        $check = $this->authUserForProject($user->id, $projectId);
-        if (empty($check) || $check->read != 1) {
+        if (ProjectMethod::authUserForProject($user->id, $projectId) != 1) {
             abort(403, 'project');
         }
         DB::table('project_users')

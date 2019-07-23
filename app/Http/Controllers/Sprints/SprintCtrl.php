@@ -12,6 +12,7 @@ use App\Models\ProjectTaskType;
 use App\Models\Sprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
+use App\Methods\ProjectMethod;
 
 class SprintCtrl extends ApiCtrl
 {
@@ -26,8 +27,7 @@ class SprintCtrl extends ApiCtrl
 
     public function getProjectSprintList(Request $request, $projectId)
     {
-        $check = $this->authUserForProject($request->user->id, $projectId);
-        if(is_null($check) || $check->read !== 1){
+        if(ProjectMethod::authUserForProject($request->user->id, $projectId) !== 1){
             abort(403);
         }
 
@@ -58,8 +58,7 @@ class SprintCtrl extends ApiCtrl
 
     public function createSprints(Request $request, $projectId)
     {
-        $check = $this->authUserForProject($request->user->id, $projectId);
-        if(is_null($check) || $check->update !== 1){
+        if(ProjectMethod::authUserForProject($request->user->id, $projectId) !== 1){
             abort(403);
         }
 
@@ -80,8 +79,7 @@ class SprintCtrl extends ApiCtrl
             $this->notFound404('sprint');
         }
 
-        $check = $this->authUserForProject($request->user->id, $sprint->project_id);
-        if(is_null($check) || $check->update !== 1){
+        if(ProjectMethod::authUserForProject($request->user->id, $sprint->project_id) !== 1){
             abort(403);
         }
 

@@ -47,29 +47,6 @@ abstract class ApiCtrl extends Controller
 
     }
 
-    /**
-     * @param $userId
-     * @param $projectId
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Query\Builder|object|null
-     */
-    protected function authUserForProject($userId, $projectId)
-    {
-        $check = DB::table('project_users as pu')
-            ->leftJoin('roles', 'pu.role_id', '=', 'roles.id')
-            ->where('pu.user_id', $userId)
-            ->where('pu.project_id', $projectId)
-            ->select(
-                'roles.create',
-                'roles.read',
-                'roles.update',
-                'roles.delete'
-            )->first();
-        if(empty($check)){
-            return null;
-        }
-        return $check;
-    }
-
     public function validatePage($page)
     {
         if(!is_numeric($page) || $page < 1){

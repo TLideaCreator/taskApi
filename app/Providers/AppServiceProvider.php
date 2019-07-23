@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use App\Format\ProjectFormat;
 use App\Format\UserFormat;
-use App\Models\Project;
+use App\Modals\Project;
 use App\Models\User;
 use Dingo\Api\Transformer\Factory;
 use Illuminate\Support\ServiceProvider;

@@ -1,6 +1,8 @@
 <?php
 
 
+use App\Http\Middleware\Authenticate;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
@@ -63,8 +65,9 @@ $app->singleton(
 
  $app->routeMiddleware([
      'auth' => App\Http\Middleware\Authenticate::class,
+     'sys_auth' => App\Http\Middleware\SystemMiddleware::class,
+     'project_auth' => App\Http\Middleware\ProjectMiddleware::class
  ]);
-
 /*
 |--------------------------------------------------------------------------
 | Register Service Providers

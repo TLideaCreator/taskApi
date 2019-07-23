@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Methods\TokenCenter;
 use App\Models\User;
 use Closure;
-use Illuminate\Contracts\Auth\Factory as Auth;
 
 class Authenticate
 {
