@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Methods\ProjectMethod;
 use Closure;
 use Dingo\Api\Http\Request;
 
@@ -16,7 +17,10 @@ class ProjectMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        echo (json_encode($request));
+        $projectId =$request->route()[2]['projectId'];
+        if(!ProjectMethod::authUserForProject($request->user->id, $projectId)){
+            abort(403);
+        }
         return $next($request);
     }
 }

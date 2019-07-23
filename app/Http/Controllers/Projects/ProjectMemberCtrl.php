@@ -16,10 +16,6 @@ class ProjectMemberCtrl extends ApiCtrl
 
     public function getProjectMemberList(Request $request, $projectId)
     {
-        $user = $request->user;
-        if(ProjectMethod::authUserForProject($user->id, $projectId) != 1){
-            $this->noPermission('project member');
-        }
         return $this->projectMemberList($projectId);
     }
 
