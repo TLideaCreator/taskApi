@@ -45,6 +45,9 @@ $api->version('v1', function ($api) {
 
     });
 
+    $api->group(['prefix'=>'system', 'middleware'=>['auth','sys_auth'], 'namespace'=> 'App\Http\Controllers\System'] , function ($api){
+        $api->get('statics', 'SystemCtrl@getSystemStatics');
+    });
     $api->group(['prefix'=>'system', 'middleware'=>['auth','sys_auth'], 'namespace'=> 'App\Http\Controllers\SystemTemp'] , function ($api){
         $api->get('template', 'SystemTempCtrl@getSystemTemplate');
         $api->post('template', 'SystemTempCtrl@createSystemTemplate');
