@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SystemTemp;
 
 
 use App\Http\Controllers\ApiCtrl;
+use App\Models\SystemTaskTemp;
 
 class SystemTempCtrl extends ApiCtrl
 {
@@ -19,6 +20,7 @@ class SystemTempCtrl extends ApiCtrl
 
     public function getSystemTemplateList()
     {
-        
+        $tempList = SystemTaskTemp::all();
+        return ['data'=>$tempList];
     }
 }

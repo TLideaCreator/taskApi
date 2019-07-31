@@ -21,6 +21,7 @@ $api->version('v1', function ($api) {
         $api->get('/', 'ProjectCtrl@projectList');
         $api->get('/latest/time', 'ProjectCtrl@getLastProjectList');
         $api->post('/', 'ProjectCtrl@createProject');
+        $api->get('/{projectId}', 'ProjectCtrl@projectDetail');
     });
 
     $api->group(['middleware' => 'auth', 'namespace' => 'App\Http\Controllers\User'], function ($api) {
@@ -48,8 +49,10 @@ $api->version('v1', function ($api) {
     $api->group(['prefix'=>'system', 'middleware'=>['auth','sys_auth'], 'namespace'=> 'App\Http\Controllers\System'] , function ($api){
         $api->get('statics', 'SystemCtrl@getSystemStatics');
     });
+    $api->group(['prefix'=>'system', 'middleware'=>['auth'], 'namespace'=> 'App\Http\Controllers\SystemTemp'] , function ($api){
+        $api->get('template', 'SystemTempCtrl@getSystemTemplateList');
+    });
     $api->group(['prefix'=>'system', 'middleware'=>['auth','sys_auth'], 'namespace'=> 'App\Http\Controllers\SystemTemp'] , function ($api){
-        $api->get('template', 'SystemTempCtrl@getSystemTemplate');
         $api->post('template', 'SystemTempCtrl@createSystemTemplate');
         $api->get('template/{tempId}', 'SystemTempCtrl@getSystemTemplate');
         $api->patch('template/{tempId}', 'SystemTempCtrl@updateSystemTemplate');
@@ -77,7 +80,6 @@ $api->version('v1', function ($api) {
     });
 
     $api->group(['prefix'=>'projects/{projectId}', 'middleware'=>['auth','project_auth'], 'namespace'=> 'App\Http\Controllers\Projects'] , function ($api){
-        $api->get('', 'ProjectCtrl@projectDetail');
         $api->patch('', 'ProjectCtrl@updateProject');
         $api->delete('', 'ProjectCtrl@removeProject');
 

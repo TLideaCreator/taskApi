@@ -44,7 +44,7 @@ class ProjectCtrl extends ApiCtrl
                 'projects.icon',
                 'projects.desc',
                 'projects.cur_sprint_id'
-            );
+            )->orderBy('projects.updated_at','desc');
         $count = $projectQuery->count();
         $projects = $projectQuery->skip(($page - 1) * $perPage)->take($perPage)->get();
         return $this->toJsonArray($projects, ['mgr'])
@@ -115,11 +115,12 @@ class ProjectCtrl extends ApiCtrl
                 select uuid() , ? , name , icon from system_task_types where temp_id = ?;',
                 [$project->id, $tempId]);
 
-
+            $roleId = DB::table('project_task_roles')->where('project_id', $project->id)->where('project_mgr', 1)->get();
+            \Log::info ('role id here is '.json_encode($roleId));
             DB::table('project_users')->insert([
                 'project_id' => $project->id,
                 'user_id' => $user->id,
-                'role_id' => DB::table('project_task_roles')->where('project_mgr', 1)->value('id')
+                'role_id' => $roleId
             ]);
             Sprint::create([
                 'name_index' => 0,
@@ -172,9 +173,6 @@ class ProjectCtrl extends ApiCtrl
     public function projectDetail(Request $request, $projectId)
     {
         $user = $request->user;
-        if (ProjectMethod::authUserForProject($user->id, $projectId) != 1) {
-            abort(403, 'project');
-        }
         DB::table('project_users')
             ->where('project_id', $projectId)
             ->where('user_id', $user->id)

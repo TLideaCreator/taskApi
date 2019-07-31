@@ -27,7 +27,7 @@ class SprintCtrl extends ApiCtrl
 
     public function getProjectSprintList(Request $request, $projectId)
     {
-        if(ProjectMethod::authUserForProject($request->user->id, $projectId) !== 1){
+        if(ProjectMethod::authUserForProject($request->user->id, $projectId)){
             abort(403);
         }
 
