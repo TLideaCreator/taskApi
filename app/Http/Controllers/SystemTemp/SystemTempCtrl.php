@@ -23,4 +23,13 @@ class SystemTempCtrl extends ApiCtrl
         $tempList = SystemTaskTemp::all();
         return ['data'=>$tempList];
     }
+
+    public function getSystemTemplateDetail($tempId){
+        $template = SystemTaskTemp::where('id', $tempId)
+            ->first();
+        if(empty($template)){
+            abort(404);
+        }
+        return ['data'=>$template];
+    }
 }

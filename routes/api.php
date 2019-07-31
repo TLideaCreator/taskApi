@@ -54,7 +54,7 @@ $api->version('v1', function ($api) {
     });
     $api->group(['prefix'=>'system', 'middleware'=>['auth','sys_auth'], 'namespace'=> 'App\Http\Controllers\SystemTemp'] , function ($api){
         $api->post('template', 'SystemTempCtrl@createSystemTemplate');
-        $api->get('template/{tempId}', 'SystemTempCtrl@getSystemTemplate');
+        $api->get('template/{tempId}', 'SystemTempCtrl@getSystemTemplateDetail');
         $api->patch('template/{tempId}', 'SystemTempCtrl@updateSystemTemplate');
         $api->delete('template/{tempId}', 'SystemTempCtrl@deleteSystemTemplate');
 

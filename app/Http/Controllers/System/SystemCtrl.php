@@ -8,13 +8,12 @@ use App\Http\Controllers\ApiCtrl;
 use App\Models\Project;
 use App\Models\SystemTaskTemp;
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 
 class SystemCtrl extends ApiCtrl
 {
     public function getSystemTemplate()
     {
-        $temps = SystemTaskTemp::get();
+        $temps = SystemTaskTemp::all();
         return ['data'=>$temps];
     }
 
