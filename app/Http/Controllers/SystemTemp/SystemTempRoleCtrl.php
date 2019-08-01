@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SystemTemp;
 
 
 use App\Http\Controllers\ApiCtrl;
+use App\Models\SystemTaskRole;
 
 class SystemTempRoleCtrl extends ApiCtrl
 {
@@ -17,5 +18,10 @@ class SystemTempRoleCtrl extends ApiCtrl
 
     }
 
-
+    public function getSystemTemplateRole($tempId)
+    {
+        $roleList = SystemTaskRole::where('temp_id', $tempId)
+            ->get();
+        return ['data'=>$roleList];
+    }
 }

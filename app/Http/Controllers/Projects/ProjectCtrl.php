@@ -81,10 +81,10 @@ class ProjectCtrl extends ApiCtrl
         $desc = Input::get('desc', null);
         $tempId = Input::get('temp', null);
         if (empty($name)) {
-            abort(400);
+            $this->notFound404('name');
         }
         if (empty($icon)) {
-            abort(400);
+            $this->notFound404('icon');
         }
         $temp = SystemTaskTemp::where('id', $tempId)->first();
         if (empty($temp)) {

@@ -67,6 +67,7 @@ abstract class ApiCtrl extends Controller
     {
         abort(404,$_ENV['APP_DEBUG']=='true'? $msg: null);
     }
+
     public function noPermission($msg)
     {
         abort(403,$_ENV['APP_DEBUG']=='true'? $msg: null);
