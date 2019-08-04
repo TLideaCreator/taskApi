@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SystemTemp;
 
 
 use App\Http\Controllers\ApiCtrl;
+use App\Models\SystemTaskType;
 
 class SystemTempTypeCtrl extends ApiCtrl
 {
@@ -15,5 +16,11 @@ class SystemTempTypeCtrl extends ApiCtrl
     public function __construct()
     {
 
+    }
+
+    public function getSystemTemplateTypes($tempId)
+    {
+        $types = SystemTaskType::where('temp_id', $tempId)->get();
+        return ['data'=>$types];
     }
 }

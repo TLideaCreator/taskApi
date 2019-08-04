@@ -17,6 +17,7 @@ class SystemTaskStatus extends TM
     protected $fillable = [
         'temp_id',
         'name',
+        'color',
         'indexes',
         'type'
     ];

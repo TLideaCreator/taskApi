@@ -17,6 +17,7 @@ class ProjectTaskStatus extends TM
     protected $fillable = [
         'project_id',
         'name',
+        'color',
         'indexes',
         'type'
     ];
