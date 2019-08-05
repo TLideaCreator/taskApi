@@ -70,8 +70,8 @@ $api->version('v1', function ($api) {
 
         $api->get('template/{tempId}/types', 'SystemTempTypeCtrl@getSystemTemplateTypes');
         $api->post('template/{tempId}/types', 'SystemTempTypeCtrl@createSystemTemplateTypes');
-        $api->patch('template/{tempId}/types/{statusId}', 'SystemTempTypeCtrl@updateSystemTemplateTypes');
-        $api->delete('template/{tempId}/types/{statusId}', 'SystemTempTypeCtrl@deleteSystemTemplateTypes');
+        $api->patch('template/{tempId}/types/{typeId}', 'SystemTempTypeCtrl@updateSystemTemplateTypes');
+        $api->delete('template/{tempId}/types/{typeId}', 'SystemTempTypeCtrl@deleteSystemTemplateTypes');
 
         $api->get('template/{tempId}/priorities', 'SystemTempPriorityCtrl@getSystemTemplatePriority');
         $api->post('template/{tempId}/priorities', 'SystemTempPriorityCtrl@createSystemTemplatePriority');

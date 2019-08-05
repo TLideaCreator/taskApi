@@ -72,4 +72,9 @@ abstract class ApiCtrl extends Controller
     {
         abort(403,$_ENV['APP_DEBUG']=='true'? $msg: null);
     }
+
+    public function noDBError($msg)
+    {
+        abort(500,$_ENV['APP_DEBUG']=='true'? $msg: null);
+    }
 }
