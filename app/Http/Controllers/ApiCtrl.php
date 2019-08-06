@@ -73,8 +73,14 @@ abstract class ApiCtrl extends Controller
         abort(403,$_ENV['APP_DEBUG']=='true'? $msg: null);
     }
 
-    public function noDBError($msg)
+    public function onDBError($obj,$msg)
     {
+        \Log::error("db error {$msg} : ".json_encode($obj) );
         abort(500,$_ENV['APP_DEBUG']=='true'? $msg: null);
+    }
+
+    public function onDateError($msg)
+    {
+        abort(423,$_ENV['APP_DEBUG']=='true'? $msg: null);
     }
 }

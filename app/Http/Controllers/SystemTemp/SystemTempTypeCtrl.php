@@ -77,8 +77,7 @@ class SystemTempTypeCtrl extends ApiCtrl
             $types = SystemTaskType::where('temp_id', $tempId)->get();
             return ['data'=>$types];
         }else{
-            \Log::info('update type error : '.json_encode($type));
-            $this->noDBError('type');
+            $this->onDBError($type, 'system template type delete ');
         }
     }
 

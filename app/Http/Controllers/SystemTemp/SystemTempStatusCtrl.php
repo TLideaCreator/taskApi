@@ -30,31 +30,31 @@ class SystemTempStatusCtrl extends ApiCtrl
     {
         $name = Input::get('name', null);
         $color = Input::get('color', null);
-        if(empty($name) || empty($color)){
+        if (empty($name) || empty($color)) {
             $this->notFound404('params');
         }
-        $tempCount = SystemTaskTemp::where('id',$tempId)->count();
-        if($tempCount < 1 ){
+        $tempCount = SystemTaskTemp::where('id', $tempId)->count();
+        if ($tempCount < 1) {
             $this->notFound404('status');
         }
-        $tempMax =  SystemTaskStatus::where('temp_id',$tempId)->max('indexes');
-        if(empty($tempMax)){
+        $tempMax = SystemTaskStatus::where('temp_id', $tempId)->max('indexes');
+        if (empty($tempMax)) {
             $tempMax = 0;
         }
         SystemTaskStatus::create([
-            'temp_id'=>$tempId,
-            'name'=>$name,
-            'color'=>$color,
-            'indexes'=>$tempMax
+            'temp_id' => $tempId,
+            'name' => $name,
+            'color' => $color,
+            'indexes' => $tempMax
         ]);
         $status = SystemTaskStatus::where('temp_id', $tempId)->get();
         return ['data' => $status];
     }
 
-    public function updateSystemTemplateStatus($tempId,$statusId)
+    public function updateSystemTemplateStatus($tempId, $statusId)
     {
         $status = SystemTaskStatus::where('id', $statusId)
-            ->where('temp_id',$tempId)
+            ->where('temp_id', $tempId)
             ->first();
         if (empty($status)) {
             $this->notFound404('status');
@@ -75,15 +75,18 @@ class SystemTempStatusCtrl extends ApiCtrl
                 $status->color = $color;
             }
         }
-        $status->save();
-        $status = SystemTaskStatus::where('temp_id', $tempId)->get();
-        return ['data' => $status];
+        if ($status->save()) {
+            $status = SystemTaskStatus::where('temp_id', $tempId)->get();
+            return ['data' => $status];
+        } else {
+            $this->onDBError($status, 'update system template status error');
+        }
     }
 
-    public function deleteSystemTemplateStatus($tempId,$statusId)
+    public function deleteSystemTemplateStatus($tempId, $statusId)
     {
         SystemTaskStatus::where('id', $statusId)
-            ->where('temp_id',$tempId)
+            ->where('temp_id', $tempId)
             ->delete();
         $status = SystemTaskStatus::where('temp_id', $tempId)->get();
         return ['data' => $status];
