@@ -99,7 +99,7 @@ class SystemTempRoleCtrl extends ApiCtrl
         if (!is_null($projectMgr)) {
             if (!is_numeric($projectMgr) ||
                 ($projectMgr != SystemTaskRole::ENABLE &&
-                    $projectMgr != $prSystemTaskRole::DISABLE)) {
+                    $projectMgr != SystemTaskRole::DISABLE)) {
                 $this->notFound404('projectMgr');
             }
             $role->project_mgr = $projectMgr;
@@ -107,13 +107,12 @@ class SystemTempRoleCtrl extends ApiCtrl
         if (!is_null($sprintMgr)) {
             if (!is_numeric($sprintMgr) ||
                 ($sprintMgr != SystemTaskRole::ENABLE &&
-                    $sprintMgr != $sSystemTaskRole::DISABLE)) {
+                    $sprintMgr != SystemTaskRole::DISABLE)) {
                 $this->notFound404('sprintMgr');
             }
             $role->sprint_mgr = $sprintMgr;
         }
         if (!is_null($taskMgr)) {
-
             if (!is_numeric($taskMgr) ||
                 ($taskMgr != SystemTaskRole::ENABLE &&
                     $taskMgr != SystemTaskRole::DISABLE)) {
@@ -123,8 +122,7 @@ class SystemTempRoleCtrl extends ApiCtrl
         }
 
         if($role->save()){
-            $roleList = SystemTaskRole::where('temp_id', $tempId)
-                ->get();
+            $roleList = SystemTaskRole::where('temp_id', $tempId)->get();
             return ['data' => $roleList];
         }else{
             $this->onDBError($role, 'system template role update error');
