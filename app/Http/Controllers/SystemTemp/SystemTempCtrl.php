@@ -31,6 +31,31 @@ class SystemTempCtrl extends ApiCtrl
         return $this->toJsonArray($tempList);
     }
 
+    public function createSystemTemplate()
+    {
+        $title = Input::get('name',null);
+        $desc = Input::get('desc',null);
+        $img = Input::get('img',null);
+
+        if(empty($title)){
+            $this->notFound404('title');
+        }
+        if(empty($desc)){
+            $this->notFound404('desc');
+        }
+
+        if(empty($img)){
+            $this->notFound404('img');
+        }
+
+        $temp = SystemTaskTemp::create([
+            'title'=>$title,
+            'desc'=>$desc,
+            'img'=>$img
+        ]);
+        return $this->toJsonItem($temp);
+    }
+
     public function getSystemTemplateDetail($tempId)
     {
         $template = SystemTaskTemp::where('id', $tempId)
@@ -80,8 +105,7 @@ class SystemTempCtrl extends ApiCtrl
         if($template->save()){
             return $this->toJsonItem($template);
         }else{
-            \Log::error('save template error '.json_encode($template));
-            abort(404);
+            $this->onDBError($template, 'update template error ');
         };
         return null;
     }

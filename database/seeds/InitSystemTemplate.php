@@ -63,11 +63,11 @@ class InitSystemTemplate extends BaseSeeder
         $types = [
             [
                 'name'=> '任务',
-                'icon'=> 'md-bookmark'
+                'icon'=> 'bookmark'
             ]  ,
             [
                 'name'=> 'BUG',
-                'icon'=> 'md-bug'
+                'icon'=> 'bug_report'
             ]
         ];
 
