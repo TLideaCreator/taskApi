@@ -8,28 +8,28 @@ class InitSystemTemplateRoles extends BaseSeeder
         $roles = [
             [
                 'name' => '管理员',
-                'logo' => 'md-contact',
+                'logo' => 'stars',
                 'project_mgr'=>1,
                 'sprint_mgr'=>1,
                 'task_mgr'=>1,
             ],
             [
                 'name' => '开发者',
-                'logo' => 'md-git-branch',
+                'logo' => 'developer_mode',
                 'project_mgr'=>0,
                 'sprint_mgr'=>0,
                 'task_mgr'=>1,
             ],
             [
                 'name' => '测试',
-                'logo' => 'md-thunderstorm',
+                'logo' => 'portrait',
                 'project_mgr'=>0,
                 'sprint_mgr'=>0,
                 'task_mgr'=>1,
             ],
             [
                 'name' => '观察者',
-                'logo' => 'md-glasses',
+                'logo' => 'visibility',
                 'project_mgr'=>0,
                 'sprint_mgr'=>0,
                 'task_mgr'=>0,
