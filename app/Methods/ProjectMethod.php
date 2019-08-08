@@ -11,7 +11,7 @@ class ProjectMethod
     /**
      * @param $userId
      * @param $projectId
-     * @return mixed|null
+     * @return mixed
      */
     public static function authUserForProject($userId, $projectId)
     {
@@ -22,6 +22,6 @@ class ProjectMethod
             ->value(
                 'ptr.project_mgr'
             );
-        return $check == 1;
+        return $check;
     }
 }

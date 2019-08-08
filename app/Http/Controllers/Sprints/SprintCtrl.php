@@ -27,12 +27,7 @@ class SprintCtrl extends ApiCtrl
 
     public function getProjectSprintList(Request $request, $projectId)
     {
-        if(ProjectMethod::authUserForProject($request->user->id, $projectId)){
-            abort(403);
-        }
-
         $type = Input::get('type', null);
-
         $sprints = Sprint::where(function ($query) use ($type){
             if($type === 'active'){
                 $query->where('status', Sprint::STATUS_ACTIVE);

@@ -18,7 +18,10 @@ class ProjectMiddleware
     public function handle(Request $request, Closure $next)
     {
         $projectId =$request->route()[2]['projectId'];
-        if(!ProjectMethod::authUserForProject($request->user->id, $projectId)){
+        $check = ProjectMethod::authUserForProject($request->user->id, $projectId);
+        var_dump(!$check);
+
+        if(!$check){
             abort(403);
         }
         return $next($request);

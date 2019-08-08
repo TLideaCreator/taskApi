@@ -101,26 +101,26 @@ class ProjectCtrl extends ApiCtrl
                 'cur_sprint_id' => '',
                 'desc' => $desc
             ]);
-            DB::insert('
+            DB::insert("
                 insert into project_task_priorities (id, project_id, name, color, is_default)
-                select uuid(), ? ,name , color, is_default from system_task_priorities where temp_id= ?;',
+                select replace(uuid(), '-', ''), ? ,name , color, is_default from system_task_priorities where temp_id= ?;",
                 [$project->id, $tempId]);
-            DB::insert('insert into project_task_status (id, project_id, name, indexes, type)
-                select uuid() , ? , name , indexes, type from system_task_status where temp_id = ?;',
+            DB::insert("insert into project_task_status (id, project_id, name, indexes, type)
+                select replace(uuid(), '-', '') , ? , name , indexes, type from system_task_status where temp_id = ?;",
                 [$project->id, $tempId]);
-            DB::insert('insert into project_task_roles (id, project_id, name, logo, project_mgr, sprint_mgr, task_mgr)
-                select uuid() , ? , name, logo, project_mgr, sprint_mgr, task_mgr from system_task_roles where temp_id = ?',
+            DB::insert("insert into project_task_roles (id, project_id, name, logo, project_mgr, sprint_mgr, task_mgr)
+                select replace(uuid(), '-', '') , ? , name, logo, project_mgr, sprint_mgr, task_mgr from system_task_roles where temp_id = ?;",
                 [$project->id, $tempId]);
-            DB::insert('insert into project_task_types (id, project_id, name, icon)
-                select uuid() , ? , name , icon from system_task_types where temp_id = ?;',
+            DB::insert("insert into project_task_types (id, project_id, name, icon)
+                select replace(uuid(), '-', '') , ? , name , icon from system_task_types where temp_id = ?;",
                 [$project->id, $tempId]);
 
-            $roleId = DB::table('project_task_roles')->where('project_id', $project->id)->where('project_mgr', 1)->get();
-            \Log::info ('role id here is '.json_encode($roleId));
+            $role = DB::table('project_task_roles')->where('project_id', $project->id)->where('project_mgr', 1)->first();
+            \Log::info ('role id here is '.json_encode($role));
             DB::table('project_users')->insert([
                 'project_id' => $project->id,
                 'user_id' => $user->id,
-                'role_id' => $roleId
+                'role_id' => $role->id
             ]);
             Sprint::create([
                 'name_index' => 0,
