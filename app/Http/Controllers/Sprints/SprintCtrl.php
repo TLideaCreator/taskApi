@@ -10,6 +10,7 @@ use App\Models\ProjectTaskPriority;
 use App\Models\ProjectTaskStatus;
 use App\Models\ProjectTaskType;
 use App\Models\Sprint;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;

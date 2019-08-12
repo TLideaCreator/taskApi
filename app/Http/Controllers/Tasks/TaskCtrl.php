@@ -43,6 +43,7 @@ class TaskCtrl extends ApiCtrl
         $reportId = Input::get('report_id', null);
         $priority = Input::get('priority', null);
         $points = Input::get('points', 0.0);
+        $status = Input::get('status', null);
         if (is_null($title)) {
             $this->notFound404('title');
         }
@@ -88,6 +89,20 @@ class TaskCtrl extends ApiCtrl
             $this->notFound404( 'points');
         }
 
+        if(is_null($status)){
+            $statusItem = ProjectTaskStatus::where('project_id',$sprint->project_id)
+                ->orderBy('indexes', 'asc')->first();
+            $status = $statusItem->id;
+        }else{
+            $count = ProjectTaskStatus::where('id',$status)->where('project_id',$sprint->project_id)
+                ->count();
+            if($count < 1){
+                $this->notFound404('status');
+            }
+        }
+
+
+
         $task = Task::create([
             'project_id'=>$sprint->project_id,
             'sprint_id'=>$sprintId,
@@ -97,7 +112,7 @@ class TaskCtrl extends ApiCtrl
             'priority'=>$priority,
             'exe_id'=>$exeId,
             'report_id'=>$reportId,
-            'status'=>'0'
+            'status'=>$status
         ]);
         return $this->toJsonItem($task, ['executor' , 'reporter']);
     }
