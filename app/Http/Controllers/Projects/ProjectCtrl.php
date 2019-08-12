@@ -105,8 +105,8 @@ class ProjectCtrl extends ApiCtrl
                 insert into project_task_priorities (id, project_id, name, color, is_default)
                 select replace(uuid(), '-', ''), ? ,name , color, is_default from system_task_priorities where temp_id= ?;",
                 [$project->id, $tempId]);
-            DB::insert("insert into project_task_status (id, project_id, name, indexes, type)
-                select replace(uuid(), '-', '') , ? , name , indexes, type from system_task_status where temp_id = ?;",
+            DB::insert("insert into project_task_status (id, project_id, name, color,indexes, type)
+                select replace(uuid(), '-', '') , ? , name,color , indexes, type from system_task_status where temp_id = ?;",
                 [$project->id, $tempId]);
             DB::insert("insert into project_task_roles (id, project_id, name, logo, project_mgr, sprint_mgr, task_mgr)
                 select replace(uuid(), '-', '') , ? , name, logo, project_mgr, sprint_mgr, task_mgr from system_task_roles where temp_id = ?;",

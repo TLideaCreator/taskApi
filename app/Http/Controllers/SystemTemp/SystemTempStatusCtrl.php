@@ -7,6 +7,7 @@ namespace App\Http\Controllers\SystemTemp;
 use App\Http\Controllers\ApiCtrl;
 use App\Models\SystemTaskStatus;
 use App\Models\SystemTaskTemp;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 
 class SystemTempStatusCtrl extends ApiCtrl
@@ -88,6 +89,47 @@ class SystemTempStatusCtrl extends ApiCtrl
         SystemTaskStatus::where('id', $statusId)
             ->where('temp_id', $tempId)
             ->delete();
+        $status = SystemTaskStatus::where('temp_id', $tempId)->get();
+        return ['data' => $status];
+    }
+
+    public function updateTemplateSequence($tempId)
+    {
+        $fromIndex = Input::get('from', null);
+        $toIndex = Input::get('to', null);
+        if (!is_numeric($fromIndex)) {
+            $this->notFound404('from');
+        }
+        if (!is_numeric($toIndex)) {
+            $this->notFound404('to');
+        }
+        if ($fromIndex != $toIndex) {
+            $status = SystemTaskStatus::where('temp_id', $tempId)
+                ->where('indexes', $fromIndex)
+                ->first();
+            if (empty($status)) {
+                $this->notFound404('status');
+            }
+            DB::transaction(function () use ($fromIndex, $toIndex, $tempId, $status) {
+                if ($fromIndex > $toIndex) {
+                    DB::update('
+                        update system_task_status set indexes = indexes + 1 
+                        where indexes >= ? and indexes < ? and id != ?
+                    ',[$toIndex, $fromIndex, $status->id]);
+                    DB::update('
+                        update system_task_status set indexes = ? where id = ?
+                    ',[$toIndex, $status->id]);
+                } else {
+                    DB::update('
+                        update system_task_status set indexes = indexes - 1 
+                        where indexes > ? and indexes <= ? and id != ?
+                    ',[$fromIndex, $toIndex, $status->id]);
+                    DB::update('
+                        update system_task_status set indexes = ? where id = ?
+                    ',[$toIndex, $status->id]);
+                }
+            });
+        }
         $status = SystemTaskStatus::where('temp_id', $tempId)->get();
         return ['data' => $status];
     }

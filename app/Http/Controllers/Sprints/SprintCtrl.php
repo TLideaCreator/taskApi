@@ -11,6 +11,7 @@ use App\Models\ProjectTaskStatus;
 use App\Models\ProjectTaskType;
 use App\Models\Sprint;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use App\Methods\ProjectMethod;
 
@@ -53,10 +54,6 @@ class SprintCtrl extends ApiCtrl
 
     public function createSprints(Request $request, $projectId)
     {
-        if(ProjectMethod::authUserForProject($request->user->id, $projectId) !== 1){
-            abort(403);
-        }
-
         $max = Sprint::where('project_id', $projectId)->max('name_index');
 
         $sprint = Sprint::create([
@@ -64,7 +61,7 @@ class SprintCtrl extends ApiCtrl
             'project_id'=>$projectId,
             'status'=>Sprint::STATUS_NORMAL
         ]);
-        return $this->toJsonItem($sprint);
+        return $this->toJsonItem($sprint,['tasks']);
     }
 
     public function makeSprintsActive(Request $request, $sprintId)

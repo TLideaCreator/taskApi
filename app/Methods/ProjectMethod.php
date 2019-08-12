@@ -22,6 +22,6 @@ class ProjectMethod
             ->value(
                 'ptr.project_mgr'
             );
-        return $check;
+        return $check == 1;
     }
 }

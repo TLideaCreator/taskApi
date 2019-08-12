@@ -36,10 +36,6 @@ class TaskCtrl extends ApiCtrl
             $this->notFound404('sprint');
         }
 
-        if (ProjectMethod::authUserForProject($request->user->id, $sprint->project_id) != 1) {
-            abort(403);
-        }
-
         $title = Input::get('title', null);
         $desc = Input::get('desc', null);
         $type = Input::get('type', null);
@@ -56,8 +52,14 @@ class TaskCtrl extends ApiCtrl
         if (!Task::checkType($sprint->project_id, $type)) {
             $this->notFound404('type');
         }
-        if (!Task::checkPriority($sprint->project_id,$priority)) {
-            $this->notFound404('priority');
+        if(is_null($priority)){
+            $priority = ProjectTaskPriority::where('project_id', $sprint->project_id)
+                ->where('is_default', 1)
+                ->value('id');
+        }else{
+            if (!Task::checkPriority($sprint->project_id,$priority)) {
+                $this->notFound404('priority');
+            }
         }
         if (is_null($reportId)) {
             $reportId = $request->user->id;
@@ -218,10 +220,6 @@ class TaskCtrl extends ApiCtrl
         $task = Task::where('id', $taskId)->first();
         if(empty($task)){
             $this->notFound404('task');
-        }
-
-        if (ProjectMethod::authUserForProject($request->user->id, $task->project_id) != 1) {
-            abort(403);
         }
 
         $sprintCount = Sprint::where('id', $sprintId)->where('project_id', $task->project_id)->count();

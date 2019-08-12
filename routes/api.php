@@ -73,6 +73,7 @@ $api->version('v1', function ($api) {
 
         $api->get('{tempId}/status', 'SystemTempStatusCtrl@getSystemTemplateStatus');
         $api->post('{tempId}/status', 'SystemTempStatusCtrl@createSystemTemplateStatus');
+        $api->patch('{tempId}/status/sequence', 'SystemTempStatusCtrl@updateTemplateSequence');
         $api->patch('{tempId}/status/{statusId}', 'SystemTempStatusCtrl@updateSystemTemplateStatus');
         $api->delete('{tempId}/status/{statusId}', 'SystemTempStatusCtrl@deleteSystemTemplateStatus');
 
