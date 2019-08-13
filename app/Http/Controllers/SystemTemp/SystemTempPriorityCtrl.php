@@ -6,7 +6,9 @@ namespace App\Http\Controllers\SystemTemp;
 
 use App\Http\Controllers\ApiCtrl;
 use App\Models\SystemTaskPriority;
+use App\Models\SystemTaskStatus;
 use App\Models\SystemTaskTemp;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 
 class SystemTempPriorityCtrl extends ApiCtrl
@@ -153,4 +155,43 @@ class SystemTempPriorityCtrl extends ApiCtrl
             $this->onDBError($priority, 'delete system template priority error');
         }
     }
+
+    public function updatePrioritySequence($tempId)
+    {
+        $fromIndex = Input::get('from', null);
+        $toIndex = Input::get('to', null);
+        if (!is_numeric($fromIndex)) {
+            $this->notFound404('from');
+        }
+        if (!is_numeric($toIndex)) {
+            $this->notFound404('to');
+        }
+        if ($fromIndex != $toIndex) {
+            $priority = SystemTaskPriority::where('temp_id', $tempId)
+                ->where('indexes', $fromIndex)
+                ->first();
+            if (empty($priority)) {
+                $this->notFound404('priority');
+            }
+            DB::transaction(function () use ($fromIndex, $toIndex, $tempId, $priority) {
+                if ($fromIndex > $toIndex) {
+                    DB::update('
+                        update system_task_priorities set indexes = indexes + 1 
+                        where indexes >= ? and indexes < ? and id != ? and temp_id = ?
+                    ', [$toIndex, $fromIndex, $priority->id, $tempId]);
+                } else {
+                    DB::update('
+                        update system_task_priorities set indexes = indexes - 1 
+                        where indexes > ? and indexes <= ? and id != ? and temp_id = ?
+                    ', [$fromIndex, $toIndex, $priority->id, $tempId]);
+                }
+                DB::update('
+                        update system_task_priorities set indexes = ? where id = ? and temp_id = ?
+                    ', [$toIndex, $priority->id, $tempId]);
+            });
+        }
+        $priority = SystemTaskPriority::where('temp_id', $tempId)->get();
+        return ['data' => $priority];
+    }
+
 }

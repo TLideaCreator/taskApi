@@ -61,13 +61,13 @@ class SystemTempTypeCtrl extends ApiCtrl
         }
         $name = Input::get('name',null);
         $icon = Input::get('icon',null);
-        if(is_null($name)){
+        if(!is_null($name)){
             if(empty($name)){
                 $this->notFound404('name');
             }
             $type->name = $name;
         }
-        if(is_null($icon)){
+        if(!is_null($icon)){
             if(empty($icon)){
                 $this->notFound404('icon');
             }
@@ -83,6 +83,13 @@ class SystemTempTypeCtrl extends ApiCtrl
 
     public function deleteSystemTemplateTypes($tempId, $typeId)
     {
+        $count = SystemTaskType::where('temp_id',$tempId)
+            ->count();
+        if($count == 1){
+            $this->onDateError('template task type limit 1');
+        }
+
+
         SystemTaskType::where('id',$typeId)
             ->where('temp_id',$tempId)
             ->delete();

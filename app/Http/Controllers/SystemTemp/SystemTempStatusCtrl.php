@@ -86,6 +86,11 @@ class SystemTempStatusCtrl extends ApiCtrl
 
     public function deleteSystemTemplateStatus($tempId, $statusId)
     {
+        $count = SystemTaskStatus::where('temp_id', $statusId)
+            ->count();
+        if($count == 1){
+            $this->onDateError('template task status limit 1');
+        }
         SystemTaskStatus::where('id', $statusId)
             ->where('temp_id', $tempId)
             ->delete();
@@ -114,20 +119,17 @@ class SystemTempStatusCtrl extends ApiCtrl
                 if ($fromIndex > $toIndex) {
                     DB::update('
                         update system_task_status set indexes = indexes + 1 
-                        where indexes >= ? and indexes < ? and id != ?
-                    ',[$toIndex, $fromIndex, $status->id]);
-                    DB::update('
-                        update system_task_status set indexes = ? where id = ?
-                    ',[$toIndex, $status->id]);
+                        where indexes >= ? and indexes < ? and id != ? and temp_id = ?
+                    ', [$toIndex, $fromIndex, $status->id, $tempId]);
                 } else {
                     DB::update('
                         update system_task_status set indexes = indexes - 1 
-                        where indexes > ? and indexes <= ? and id != ?
-                    ',[$fromIndex, $toIndex, $status->id]);
-                    DB::update('
-                        update system_task_status set indexes = ? where id = ?
-                    ',[$toIndex, $status->id]);
+                        where indexes > ? and indexes <= ? and id != ? and temp_id = ?
+                    ', [$fromIndex, $toIndex, $status->id, $tempId]);
                 }
+                DB::update('
+                        update system_task_status set indexes = ? where id = ? and temp_id = ?
+                    ', [$toIndex, $status->id, $tempId]);
             });
         }
         $status = SystemTaskStatus::where('temp_id', $tempId)->get();

@@ -84,6 +84,7 @@ $api->version('v1', function ($api) {
 
         $api->get('{tempId}/priorities', 'SystemTempPriorityCtrl@getSystemTemplatePriority');
         $api->post('{tempId}/priorities', 'SystemTempPriorityCtrl@createSystemTemplatePriority');
+        $api->patch('{tempId}/priorities/sequence', 'SystemTempPriorityCtrl@updatePrioritySequence');
         $api->patch('{tempId}/priorities/{priorityId}', 'SystemTempPriorityCtrl@updateSystemTemplatePriority');
         $api->delete('{tempId}/priorities/{priorityId}', 'SystemTempPriorityCtrl@deleteSystemTemplatePriority');
     });
@@ -96,25 +97,27 @@ $api->version('v1', function ($api) {
         $api->post('/members/{memberId}/roles/{roleId}', 'ProjectMemberCtrl@addMemberToProject');
         $api->delete('/members/{memberId}', 'ProjectMemberCtrl@delProjectMembers');
 
-        $api->get('/setting/roles', 'SystemTempRoleCtrl@getSystemTemplateRole');
-        $api->post('/setting/roles', 'SystemTempRoleCtrl@createSystemTemplateRole');
-        $api->patch('/setting/roles/{roleId}', 'SystemTempRoleCtrl@updateSystemTemplateRole');
-        $api->delete('/setting/roles/{roleId}', 'SystemTempRoleCtrl@deleteSystemTemplateRole');
+        $api->get('/settings/roles', 'ProjectRoleCtrl@getProjectRole');
+        $api->post('/settings/roles', 'ProjectRoleCtrl@createProjectRole');
+        $api->patch('/settings/roles/{roleId}', 'ProjectRoleCtrl@updateProjectRole');
+        $api->delete('/settings/roles/{roleId}', 'ProjectRoleCtrl@deleteProjectRole');
 
-        $api->get('/setting/status', 'SystemTempStatusCtrl@getSystemTemplateStatus');
-        $api->post('/setting/status', 'SystemTempStatusCtrl@createSystemTemplateStatus');
-        $api->patch('/setting/status/{statusId}', 'SystemTempStatusCtrl@updateSystemTemplateStatus');
-        $api->delete('/setting/status/{statusId}', 'SystemTempStatusCtrl@deleteSystemTemplateStatus');
+        $api->get('/settings/status', 'ProjectStatusCtrl@getProjectStatus');
+        $api->post('/settings/status', 'ProjectStatusCtrl@createProjectStatus');
+        $api->patch('/settings/status/sequence', 'ProjectStatusCtrl@updateProjectStatusSequence');
+        $api->patch('/settings/status/{statusId}', 'ProjectStatusCtrl@updateProjectStatus');
+        $api->delete('/settings/status/{statusId}', 'ProjectStatusCtrl@deleteProjectStatus');
 
-        $api->get('/setting/types', 'SystemTempTypeCtrl@getSystemTemplateTypes');
-        $api->post('/setting/types', 'SystemTempTypeCtrl@createSystemTemplateTypes');
-        $api->patch('/setting/types/{statusId}', 'SystemTempTypeCtrl@updateSystemTemplateTypes');
-        $api->delete('/setting/types/{statusId}', 'SystemTempTypeCtrl@deleteSystemTemplateTypes');
+        $api->get('/settings/types', 'ProjectTypeCtrl@getProjectTypes');
+        $api->post('/settings/types', 'ProjectTypeCtrl@createProjectTypes');
+        $api->patch('/settings/types/{statusId}', 'ProjectTypeCtrl@updateProjectTypes');
+        $api->delete('/settings/types/{statusId}', 'ProjectTypeCtrl@deleteProjectTypes');
 
-        $api->get('/setting/priorities', 'SystemTempPriorityCtrl@getSystemTemplatePriority');
-        $api->post('/setting/priorities', 'SystemTempPriorityCtrl@createSystemTemplatePriority');
-        $api->patch('/setting/priorities/{priorityId}', 'SystemTempPriorityCtrl@updateSystemTemplatePriority');
-        $api->delete('/setting/priorities/{priorityId}', 'SystemTempPriorityCtrl@deleteSystemTemplatePriority');
+        $api->get('/settings/priorities', 'ProjectPrioritiesCtrl@getProjectPriority');
+        $api->post('/settings/priorities', 'ProjectPrioritiesCtrl@createProjectPriority');
+        $api->patch('/settings/priorities/sequence', 'ProjectPrioritiesCtrl@updateProjectPrioritySequence');
+        $api->patch('/settings/priorities/{priorityId}', 'ProjectPrioritiesCtrl@updateProjectPriority');
+        $api->delete('/settings/priorities/{priorityId}', 'ProjectPrioritiesCtrl@deleteProjectPriority');
 
     });
 

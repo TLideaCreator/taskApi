@@ -19,8 +19,6 @@ class ProjectMiddleware
     {
         $projectId =$request->route()[2]['projectId'];
         $check = ProjectMethod::authUserForProject($request->user->id, $projectId);
-        var_dump(!$check);
-
         if(!$check){
             abort(403);
         }
