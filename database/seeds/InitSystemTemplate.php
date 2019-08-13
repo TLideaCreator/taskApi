@@ -42,22 +42,18 @@ class InitSystemTemplate extends BaseSeeder
             [
                 'name'=>'待开发',
                 'indexes'=> 1,
-                'type' => \App\Models\SystemTaskStatus::TYPE_START
             ],
             [
                 'name'=>'开发中',
                 'indexes'=> 2,
-                'type' => \App\Models\SystemTaskStatus::TYPE_PROGRESS
             ],
             [
                 'name'=>'开发完成',
                 'indexes'=> 3,
-                'type' => \App\Models\SystemTaskStatus::TYPE_PROGRESS
             ],
             [
                 'name'=>'测试完成',
                 'indexes'=> 4,
-                'type' => \App\Models\SystemTaskStatus::TYPE_FINISH
             ]
         ];
         $types = [

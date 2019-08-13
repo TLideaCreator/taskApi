@@ -8,8 +8,16 @@ use App\Format\ProjectFormat;
 use App\Http\Controllers\ApiCtrl;
 use App\Methods\ProjectMethod;
 use App\Models\Project;
+use App\Models\ProjectTaskPriority;
+use App\Models\ProjectTaskRole;
+use App\Models\ProjectTaskStatus;
+use App\Models\ProjectTaskType;
 use App\Models\Sprint;
+use App\Models\SystemTaskPriority;
+use App\Models\SystemTaskRole;
+use App\Models\SystemTaskStatus;
 use App\Models\SystemTaskTemp;
+use App\Models\SystemTaskType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
@@ -101,26 +109,56 @@ class ProjectCtrl extends ApiCtrl
                 'cur_sprint_id' => '',
                 'desc' => $desc
             ]);
-            DB::insert("
-                insert into project_task_priorities (id, project_id, name, color, indexes,is_default)
-                select replace(uuid(), '-', ''), ? ,name , color,indexes ,is_default from system_task_priorities where temp_id= ?;",
-                [$project->id, $tempId]);
-            DB::insert("insert into project_task_status (id, project_id, name, color,indexes, type)
-                select replace(uuid(), '-', '') , ? , name,color , indexes, type from system_task_status where temp_id = ?;",
-                [$project->id, $tempId]);
-            DB::insert("insert into project_task_roles (id, project_id, name, logo, project_mgr, sprint_mgr, task_mgr)
-                select replace(uuid(), '-', '') , ? , name, logo, project_mgr, sprint_mgr, task_mgr from system_task_roles where temp_id = ?;",
-                [$project->id, $tempId]);
-            DB::insert("insert into project_task_types (id, project_id, name, icon)
-                select replace(uuid(), '-', '') , ? , name , icon from system_task_types where temp_id = ?;",
-                [$project->id, $tempId]);
+            $tempPriorities = SystemTaskPriority::where('temp_id',$tempId)->get();
+            foreach ($tempPriorities as $tempPriority) {
+                ProjectTaskPriority::create([
+                    'project_id'=>$project->id,
+                    'name'=>$tempPriority->name,
+                    'color'=>$tempPriority->color,
+                    'indexes'=>$tempPriority->indexes,
+                    'is_default'=>$tempPriority->is_default,
+                ]);
+            }
 
-            $role = DB::table('project_task_roles')->where('project_id', $project->id)->where('project_mgr', 1)->first();
-            \Log::info ('role id here is '.json_encode($role));
+            $tempStatusList = SystemTaskStatus::where('temp_id',$tempId)->get();
+            foreach ($tempStatusList as $tempStatus) {
+                ProjectTaskStatus::create(
+                    [
+                        'project_id'=>$project->id,
+                        'name'=>$tempStatus->name,
+                        'color'=>$tempStatus->color,
+                        'indexes'=>$tempStatus->indexes,
+                    ]
+                );
+            }
+            $tempRoles = SystemTaskRole::where('temp_id',$tempId)->get();
+            $roleId = '';
+            foreach ($tempRoles as $tempRole) {
+                $role = ProjectTaskRole::create([
+                        'project_id'=>$project->id,
+                        'name'=>$tempRole->name,
+                        'logo'=>$tempRole->logo,
+                        'project_mgr'=>$tempRole->project_mgr,
+                        'sprint_mgr'=>$tempRole->sprint_mgr,
+                        'task_mgr'=>$tempRole->task_mgr,
+                    ]);
+                if($role->project_mgr == ProjectTaskRole::ENABLE){
+                    $roleId = $role->id;
+                }
+            }
+           $tempTypes = SystemTaskType::where('temp_id', $tempId)->get();
+            foreach ($tempTypes as $tempType) {
+                ProjectTaskType::create([
+                    'project_id'=>$project->id,
+                    'name'=>$tempType->name,
+                    'icon'=>$tempType->icon,
+                ]);
+            }
+
             DB::table('project_users')->insert([
                 'project_id' => $project->id,
                 'user_id' => $user->id,
-                'role_id' => $role->id
+                'role_id' => $roleId
             ]);
             Sprint::create([
                 'name_index' => 0,
