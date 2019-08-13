@@ -72,7 +72,7 @@ class SprintCtrl extends ApiCtrl
             $this->notFound404('sprint');
         }
 
-        if(ProjectMethod::authUserForProject($request->user->id, $sprint->project_id) !== 1){
+        if(!ProjectMethod::authUserForSprint($request->user->id, $sprint->project_id)){
             abort(403);
         }
 
