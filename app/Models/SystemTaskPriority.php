@@ -15,6 +15,7 @@ class SystemTaskPriority extends TM
         'temp_id',
         'name',
         'color',
+        'indexes',
         'is_default'
     ];
 }

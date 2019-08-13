@@ -51,10 +51,18 @@ class SystemTempPriorityCtrl extends ApiCtrl
             $this->notFound404('is_default');
         }
 
+        $max = SystemTaskPriority::where('temp_id', $tempId)->max('indexes');
+        if(is_null($max)){
+            $max=1;
+        }else {
+            $max = $max +1;
+        }
+
         $priority = SystemTaskPriority::create([
             'name' => $name,
             'color' => $color,
             'is_default' => $isDefault,
+            'indexes'=>$max,
             'temp_id' => $tempId
         ]);
 
@@ -70,7 +78,9 @@ class SystemTempPriorityCtrl extends ApiCtrl
 
     public function updateSystemTemplatePriority($tempId, $priorityId)
     {
-        $priority = SystemTaskPriority::where('id', $priorityId)->where('temp_id', $tempId)->first();
+        $priority = SystemTaskPriority::where('id', $priorityId)
+            ->where('temp_id', $tempId)
+            ->first();
         if (empty($priority)) {
             $this->notFound404('priority');
         }

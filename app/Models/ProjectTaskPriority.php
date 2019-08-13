@@ -13,6 +13,7 @@ class ProjectTaskPriority extends TM
         'project_id',
         'name',
         'color',
+        'indexes',
         'is_default'
     ];
 }
