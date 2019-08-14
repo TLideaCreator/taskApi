@@ -123,9 +123,6 @@ class TaskCtrl extends ApiCtrl
         if(empty($task)){
             $this->notFound404('task');
         }
-        if(ProjectMethod::authUserForProject($request->user->id, $task->project_id) !== 1){
-            $this->noPermission('no permission');
-        }
         $member = User::rightJoin('project_users as pu', 'pu.user_id', '=' , 'users.id')
             ->leftjoin('roles', 'roles.id', '=' ,'pu.role_id')
             ->where('pu.project_id', $task->project_id)

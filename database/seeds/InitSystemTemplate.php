@@ -15,27 +15,32 @@ class InitSystemTemplate extends BaseSeeder
             [
                 'name' => '最低',
                 'color' => '#D58AA0',
-                'is_default' => 0
+                'is_default' => 0,
+                'indexes'=> 1
             ],
             [
                 'name' => '低',
                 'color' => '#43D6BC',
-                'is_default' => 0
+                'is_default' => 0,
+                'indexes'=> 2
             ],
             [
                 'name' => '普通',
                 'color' => '#4AE8B8',
-                'is_default' => 1
+                'is_default' => 1,
+                'indexes'=> 3
             ],
             [
                 'name' => '高',
                 'color' => '#FD785E',
-                'is_default' => 0
+                'is_default' => 0,
+                'indexes'=> 4
             ],
             [
                 'name' => '最高',
                 'color' => '#EF4A37',
-                'is_default' => 0
+                'is_default' => 0,
+                'indexes'=> 5
             ]
         ];
         $status = [
