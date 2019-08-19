@@ -17,7 +17,8 @@ class Project extends TM implements CursorInterface
         'desc',
         'status',
         'creator_id',
-        'cur_sprint_id'
+        'cur_sprint_id',
+        'task_indexes'
     ];
     protected $hidden = [
         'created_at',

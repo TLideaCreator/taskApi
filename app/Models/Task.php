@@ -6,6 +6,7 @@ namespace App\Models;
 class Task extends TM
 {
     protected $fillable=[
+        'indexes',
         'project_id',
         'sprint_id',
         'title',

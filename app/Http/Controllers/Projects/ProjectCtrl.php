@@ -102,6 +102,7 @@ class ProjectCtrl extends ApiCtrl
         $project = DB::transaction(function () use ($user, $name, $desc, $icon, $tempId) {
 
             $project = Project::create([
+                'task_indexes' => 0,
                 'name' => $name,
                 'icon' => $icon,
                 'status' => 0,

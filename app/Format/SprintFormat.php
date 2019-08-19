@@ -47,6 +47,7 @@ class SprintFormat extends TransformerAbstract
             }
             return [
                 'id' => $task->id,
+                'indexes' => $task->indexes,
                 'title' => $task->title,
                 'desc' => $task->desc,
                 'type' => $task->type,

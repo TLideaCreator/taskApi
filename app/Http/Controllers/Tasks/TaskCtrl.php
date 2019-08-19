@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Tasks;
 
 use App\Format\TaskFormat;
 use App\Http\Controllers\ApiCtrl;
+use App\Models\Project;
 use App\Models\ProjectTaskPriority;
 use App\Models\ProjectTaskStatus;
 use App\Models\ProjectTaskType;
@@ -32,7 +33,7 @@ class TaskCtrl extends ApiCtrl
     public function createTask(Request $request, $sprintId)
     {
         $sprint = Sprint::where('id', $sprintId)->first();
-        if(empty($sprint)){
+        if (empty($sprint)) {
             $this->notFound404('sprint');
         }
 
@@ -40,7 +41,7 @@ class TaskCtrl extends ApiCtrl
         $desc = Input::get('desc', null);
         $type = Input::get('type', null);
         $exeId = Input::get('exe_id', null);
-        $reportId = Input::get('report_id', null);
+        $reportId = Input::get('report_id', $request->user->id);
         $priority = Input::get('priority', null);
         $points = Input::get('points', 0.0);
         $status = Input::get('status', null);
@@ -50,81 +51,87 @@ class TaskCtrl extends ApiCtrl
         if (is_null($desc)) {
             $this->notFound404('desc');
         }
-        if (!Task::checkType($sprint->project_id, $type)) {
-            $this->notFound404('type');
+
+
+        if (!is_numeric($points) || $points < 0) {
+            $this->notFound404('points');
         }
-        if(is_null($priority)){
-            $priority = ProjectTaskPriority::where('project_id', $sprint->project_id)
-                ->where('is_default', 1)
-                ->value('id');
-        }else{
-            if (!Task::checkPriority($sprint->project_id,$priority)) {
-                $this->notFound404('priority');
+
+        $task = DB::transaction(function () use ($title, $desc, $type, $exeId, $reportId, $priority, $points, $status, $sprintId, $sprint) {
+            if (!Task::checkType($sprint->project_id, $type)) {
+                $this->notFound404('type');
             }
-        }
-        if (is_null($reportId)) {
-            $reportId = $request->user->id;
-        }else{
+            if (is_null($priority)) {
+                $priority = ProjectTaskPriority::where('project_id', $sprint->project_id)
+                    ->where('is_default', 1)
+                    ->value('id');
+            } else {
+                if (!Task::checkPriority($sprint->project_id, $priority)) {
+                    $this->notFound404('priority');
+                }
+            }
             $userCount = DB::table('project_users')
                 ->where('project_id', $sprint->project_id)
                 ->where('user_id', $reportId)
                 ->count();
-            if($userCount == 0){
+            if ($userCount == 0) {
                 $this->notFound404('report');
             }
-        }
-        if (is_null($exeId)) {
-            $exeId = '';
-        } else {
-            $userCount = DB::table('project_users')
-                ->where('project_id', $sprint->project_id)
-                ->where('user_id', $reportId)
-                ->count();
-            if($userCount == 0){
-                $this->notFound404('exe');
+            if (is_null($exeId)) {
+                $exeId = '';
+            } else {
+                $userCount = DB::table('project_users')
+                    ->where('project_id', $sprint->project_id)
+                    ->where('user_id', $reportId)
+                    ->count();
+                if ($userCount == 0) {
+                    $this->notFound404('exe');
+                }
             }
-        }
 
-        if(!is_numeric($points) || $points < 0){
-            $this->notFound404( 'points');
-        }
 
-        if(is_null($status)){
-            $statusItem = ProjectTaskStatus::where('project_id',$sprint->project_id)
-                ->orderBy('indexes', 'asc')->first();
-            $status = $statusItem->id;
-        }else{
-            $count = ProjectTaskStatus::where('id',$status)->where('project_id',$sprint->project_id)
-                ->count();
-            if($count < 1){
-                $this->notFound404('status');
+            if (is_null($status)) {
+                $statusItem = ProjectTaskStatus::where('project_id', $sprint->project_id)
+                    ->orderBy('indexes', 'asc')->first();
+                $status = $statusItem->id;
+            } else {
+                $count = ProjectTaskStatus::where('id', $status)->where('project_id', $sprint->project_id)
+                    ->count();
+                if ($count < 1) {
+                    $this->notFound404('status');
+                }
             }
-        }
+
+            $indexes = Project::where('id', $sprint->project_id)->value('task_indexes');
 
 
+            $task = Task::create([
+                'indexes' => $indexes+1,
+                'project_id' => $sprint->project_id,
+                'sprint_id' => $sprintId,
+                'title' => $title,
+                'desc' => $desc,
+                'type' => $type,
+                'priority' => $priority,
+                'exe_id' => $exeId,
+                'report_id' => $reportId,
+                'status' => $status
+            ]);
+            DB::update('update projects set task_indexes = task_indexes + 1 where id = ? ', [$sprint->project_id]);
+            return $task;
+        });
 
-        $task = Task::create([
-            'project_id'=>$sprint->project_id,
-            'sprint_id'=>$sprintId,
-            'title'=>$title,
-            'desc'=>$desc,
-            'type'=>$type,
-            'priority'=>$priority,
-            'exe_id'=>$exeId,
-            'report_id'=>$reportId,
-            'status'=>$status
-        ]);
-        return $this->toJsonItem($task, ['executor' , 'reporter']);
+        return $this->toJsonItem($task, ['executor', 'reporter']);
     }
 
-    public function getTaskDetail(Request $request,$taskId)
+    public function getTaskDetail(Request $request, $taskId)
     {
         $task = Task::where('id', $taskId)->first();
-        if(empty($task)){
+        if (empty($task)) {
             $this->notFound404('task');
         }
-        $member = User::rightJoin('project_users as pu', 'pu.user_id', '=' , 'users.id')
-            ->leftjoin('roles', 'roles.id', '=' ,'pu.role_id')
+        $member = User::rightJoin('project_users as pu', 'pu.user_id', '=', 'users.id')
+            ->leftjoin('roles', 'roles.id', '=', 'pu.role_id')
             ->where('pu.project_id', $task->project_id)
             ->select(
                 'users.nickname as username',
@@ -140,24 +147,21 @@ class TaskCtrl extends ApiCtrl
         $priorities = ProjectTaskPriority::where('project_id', $task->project_id)->get();
         $status = ProjectTaskStatus::where('project_id', $task->project_id)->get();
         $types = ProjectTaskType::where('project_id', $task->project_id)->get();
-        return $this->toJsonItem($task, ['executor' , 'reporter'])->setMeta([
-            'project_members'=>$member,
-            'project_priorities'=>$priorities,
-            'project_status'=>$status,
-            'project_types'=>$types
+        return $this->toJsonItem($task, ['executor', 'reporter'])->setMeta([
+            'project_members' => $member,
+            'project_priorities' => $priorities,
+            'project_status' => $status,
+            'project_types' => $types
         ]);
     }
 
     public function updateTask(Request $request, $taskId)
     {
         $task = Task::where('id', $taskId)->first();
-        if(empty($task)){
+        if (empty($task)) {
             $this->notFound404('task');
         }
 
-        if (ProjectMethod::authUserForProject($request->user->id, $task->project_id) != 1) {
-            abort(403);
-        }
         $title = Input::get('title', null);
         $desc = Input::get('desc', null);
         $type = Input::get('type', null);
@@ -167,13 +171,13 @@ class TaskCtrl extends ApiCtrl
         $points = Input::get('points', null);
         $status = Input::get('status', null);
 
-        if (!empty($title) ) {
+        if (!empty($title)) {
             $task->title = $title;
         }
         if (!empty($desc)) {
             $task->desc = $desc;
         }
-        if (Task::checkType($task->project_id,$type)) {
+        if (Task::checkType($task->project_id, $type)) {
             $task->type = $type;
         }
         if (Task::checkPriority($task->project_id, $priority)) {
@@ -188,30 +192,30 @@ class TaskCtrl extends ApiCtrl
                 ->where('project_id', $task->project_id)
                 ->where('user_id', $reportId)
                 ->count();
-            if($userCount != 0){
+            if ($userCount != 0) {
                 $task->report_id = $reportId;
             }
         }
         if (!is_null($exeId)) {
-            if(!empty($exeId)){
+            if (!empty($exeId)) {
                 $userCount = DB::table('project_users')
                     ->where('project_id', $task->project_id)
                     ->where('user_id', $reportId)
                     ->count();
-                if($userCount != 0){
+                if ($userCount != 0) {
                     $task->exe_id = $exeId;
                 }
-            }else{
+            } else {
                 $task->exe_id = $exeId;
             }
         }
 
-        if(is_numeric($points) && $points >= 0){
+        if (is_numeric($points) && $points >= 0) {
             $task->points = $points;
         }
         $task->save();
-        $member = User::rightJoin('project_users as pu', 'pu.user_id', '=' , 'users.id')
-            ->leftjoin('roles', 'roles.id', '=' ,'pu.role_id')
+        $member = User::rightJoin('project_users as pu', 'pu.user_id', '=', 'users.id')
+            ->leftjoin('roles', 'roles.id', '=', 'pu.role_id')
             ->where('pu.project_id', $task->project_id)
             ->select(
                 'users.nickname as username',
@@ -224,22 +228,22 @@ class TaskCtrl extends ApiCtrl
                 'roles.delete'
             )
             ->get();
-        return $this->toJsonItem($task, ['executor' , 'reporter'])->setMeta(['project_members'=>$member]);
+        return $this->toJsonItem($task, ['executor', 'reporter'])->setMeta(['project_members' => $member]);
     }
 
     public function moveTaskToSprint(Request $request, $taskId, $sprintId)
     {
         $task = Task::where('id', $taskId)->first();
-        if(empty($task)){
+        if (empty($task)) {
             $this->notFound404('task');
         }
 
         $sprintCount = Sprint::where('id', $sprintId)->where('project_id', $task->project_id)->count();
-        if($sprintCount == 0){
+        if ($sprintCount == 0) {
             $this->notFound404('sprint');
         }
         $task->sprint_id = $sprintId;
         $task->save();
-        return $this->toJsonItem($task, ['executor' , 'reporter']);
+        return $this->toJsonItem($task, ['executor', 'reporter']);
     }
 }
