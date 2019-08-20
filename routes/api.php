@@ -36,6 +36,7 @@ $api->version('v1', function ($api) {
         $api->get('/{projectId}/sprints', 'SprintCtrl@getProjectSprintList');
         $api->post('/{projectId}/sprints', 'SprintCtrl@createSprints');
         $api->post('/sprints/{sprintId}/implementation', 'SprintCtrl@makeSprintsActive');
+        $api->patch('/sprints/{sprintId}/finish', 'SprintCtrl@makeSprintsFinish');
     });
 
     $api->group(['prefix' => 'projects/sprints', 'middleware' => 'auth', 'namespace' => 'App\Http\Controllers\Tasks'], function ($api) {
