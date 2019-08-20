@@ -68,7 +68,7 @@ class SprintCtrl extends ApiCtrl
     public function makeSprintsActive(Request $request, $sprintId)
     {
         $sprint = Sprint::where('id', $sprintId)
-            ->where('name', '!=' , 0)
+            ->where('name_index', '!=', 0)
             ->first();
         if (empty($sprint)) {
             $this->notFound404('sprint');
@@ -111,17 +111,19 @@ class SprintCtrl extends ApiCtrl
                 if (empty($startStatus)) {
                     throw new \Exception(404);
                 }
-                $startSprint = Sprint::where('project_id', $sprint->project_id)->where('name', 0)->first();
+                $startSprint = Sprint::where('project_id', $sprint->project_id)->where('name_index', 0)->first();
 
                 DB::update('update tasks set status = ? , sprint_id = ? where sprint_id = ? ',
-                    [$startStatus->id, $startSprint->id,$sprint->id]);
+                    [$startStatus->id, $startSprint->id, $sprint->id]);
 
                 $sprint->status = Sprint::STATUS_FINISH;
                 $sprint->end_time = time();
-                if ($sprint->save()) {
+                if (!$sprint->save()) {
                     throw new \Exception(500);
                 }
+                return $sprint;
             });
+            return $this->toJsonItem($sprint);
         } catch (\Exception $ex) {
             switch ($ex->getMessage()) {
                 case '404':
@@ -132,6 +134,5 @@ class SprintCtrl extends ApiCtrl
                     break;
             }
         }
-
     }
 }

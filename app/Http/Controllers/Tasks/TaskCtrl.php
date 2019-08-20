@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Tasks;
 
 use App\Format\TaskFormat;
 use App\Http\Controllers\ApiCtrl;
+use App\Methods\FormatMethod;
+use App\Methods\ProjectMethod;
 use App\Models\Project;
 use App\Models\ProjectTaskPriority;
 use App\Models\ProjectTaskStatus;
@@ -13,10 +15,11 @@ use App\Models\ProjectTaskType;
 use App\Models\Sprint;
 use App\Models\Task;
 use App\Models\User;
+use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Input;
-use App\Methods\ProjectMethod;
 
 class TaskCtrl extends ApiCtrl
 {
@@ -245,5 +248,43 @@ class TaskCtrl extends ApiCtrl
         $task->sprint_id = $sprintId;
         $task->save();
         return $this->toJsonItem($task, ['executor', 'reporter']);
+    }
+
+    public function taskUpdateFile(Request $request,$projectId,$taskId)
+    {
+//        if(!ProjectMethod::authUserForTask($projectId, $request->user->id)){
+//            $this->noPermission('update file');
+//        }
+
+        if(!$request->hasFile('file') || !$request->file('file')->isValid()){
+            abort(503);
+        }
+        $task = Task::where('id', $taskId)
+            ->where('project_id',$projectId)
+            ->first();
+        if(empty($task)){
+            $this->notFound404('task');
+        }
+        $file = $request->file('file');
+
+        if(!FormatMethod::matchImageMimeType($file->getMimeType())){
+            abort(405);
+        }
+
+        $fileType = explode('/', $file->getMimeType());
+        $filePath = 'projects/'.$projectId.'/tasks/'.$taskId;
+        $filePath = $file->move($_SERVER['FILE_PATH'].'/'.$filePath, str_replace('-','', Uuid::uuid()));
+        return $_SERVER['HTTP_HOST'].str_replace($_SERVER['FILE_PATH'],'/api',$filePath);
+    }
+
+    public function getTaskFile($projectId , $taskId, $fileName)
+    {
+        $filePath = $_SERVER['FILE_PATH'].'/projects/'.$projectId.'/tasks/'.$taskId.'/'.$fileName;
+        if(empty($filePath) || !file_exists($filePath)){
+            return '';
+        }else {
+            $fileType = explode('.',$filePath);
+            return response(File::get($filePath))->header('Content-Type', 'image/jpeg');
+        }
     }
 }

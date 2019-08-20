@@ -64,4 +64,10 @@ class FormatMethod
         $regex = '/^[A-Za-z0-9_-]{6,16}$/';
         return preg_match($regex, $pwd);
     }
+
+    public static function matchImageMimeType($mimeType){
+        return strtolower($mimeType) == strtolower('image/png') ||
+            strtolower($mimeType) == strtolower('image/jpg') ||
+            strtolower($mimeType) == strtolower('image/jpeg') ;
+    }
 }

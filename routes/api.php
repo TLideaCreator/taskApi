@@ -32,6 +32,11 @@ $api->version('v1', function ($api) {
         $api->delete('/users/{userId}', 'UserCtrl@deleteUser');
     });
 
+    $api->group(['prefix'=>'projects/{projectId}',  'namespace'=>'App\Http\Controllers\Tasks'],function ($api){
+        $api->get('/tasks/{taskId}/{fileName}','TaskCtrl@getTaskFile');
+        $api->post('/tasks/{taskId}','TaskCtrl@taskUpdateFile');
+    });
+
     $api->group(['prefix' => 'projects', 'middleware' => 'auth', 'namespace' => 'App\Http\Controllers\Sprints'], function ($api) {
         $api->get('/{projectId}/sprints', 'SprintCtrl@getProjectSprintList');
         $api->post('/{projectId}/sprints', 'SprintCtrl@createSprints');
