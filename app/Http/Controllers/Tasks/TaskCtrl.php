@@ -274,7 +274,7 @@ class TaskCtrl extends ApiCtrl
         $fileType = explode('/', $file->getMimeType());
         $filePath = 'projects/'.$projectId.'/tasks/'.$taskId;
         $filePath = $file->move($_SERVER['FILE_PATH'].'/'.$filePath, str_replace('-','', Uuid::uuid()));
-        return $_SERVER['HTTP_HOST'].str_replace($_SERVER['FILE_PATH'],'/api',$filePath);
+        return ['data'=>'http://'.$_SERVER['HTTP_HOST'].str_replace($_SERVER['FILE_PATH'],'/api',$filePath)];
     }
 
     public function getTaskFile($projectId , $taskId, $fileName)
