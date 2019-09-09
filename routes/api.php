@@ -50,6 +50,11 @@ $api->version('v1', function ($api) {
         $api->post('/{sprintId}/tasks', 'TaskCtrl@createTask');
         $api->patch('/tasks/{taskId}/movement/sprints/{sprintId}', 'TaskCtrl@moveTaskToSprint');
 
+        $api->get('/tasks/{taskId}/comments', 'TaskCommentCtrl@getTaskComments');
+        $api->post('/tasks/{taskId}/comments', 'TaskCommentCtrl@createTaskComments');
+        $api->patch('/tasks/{taskId}/comments/{commentId}', 'TaskCommentCtrl@updateTaskComments');
+        $api->delete('/tasks/{taskId}/comments/{commentId}', 'TaskCommentCtrl@delTaskComments');
+
     });
 
     $api->group(['prefix' => 'system', 'middleware' => ['auth', 'sys_auth'], 'namespace' => 'App\Http\Controllers\System'], function ($api) {

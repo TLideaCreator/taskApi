@@ -14,8 +14,9 @@ class CreateTableTaskAdnex extends Migration
     public function up()
     {
         Schema::create('task_adnex', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->timestamps();
+            $table->uuid("project_id");
+            $table->uuid("task_id");
+            $table->uuid("file_name");
         });
     }
 
