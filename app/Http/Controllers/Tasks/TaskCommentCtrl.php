@@ -8,8 +8,8 @@ use App\Format\CommentFormat;
 use App\Http\Controllers\ApiCtrl;
 use App\Models\Task;
 use App\Models\TaskComment;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Request;
 
 class TaskCommentCtrl extends ApiCtrl
 {
@@ -24,8 +24,20 @@ class TaskCommentCtrl extends ApiCtrl
 
     public function getTaskComments(Request $request , $taskId)
     {
-        $comments = TaskComment::where('task_id', $taskId)->get();
-        return $this->toJsonArray($comments, ['creator']);
+        $page = $this->validatePage(Input::get('page', null));
+        $perPage = $this->validatePageCount(Input::get('per_page', null));
+
+        $commentsSql = TaskComment::where('task_id', $taskId);
+
+        $comments = $commentsSql->skip(($page - 1) * $perPage)
+            ->take($perPage)
+            ->orderBy('created_at','desc')
+            ->get();
+        return $this->toJsonArray($comments, ['creator'])->setMeta([
+            'total' => $commentsSql->count(),
+            'page' => $page,
+            'per_page'=>$perPage
+        ]);
     }
 
     public function createTaskComments(Request $request ,$taskId)
@@ -42,7 +54,7 @@ class TaskCommentCtrl extends ApiCtrl
             'project_id' => $projectId,
             'content' => $content
         ]);
-        $this->toJsonItem($comment,['creator']);
+        return $this->toJsonItem($comment,['creator']);
     }
 
     public function updateTaskComments(Request $request ,$taskId, $commentId)
@@ -57,7 +69,7 @@ class TaskCommentCtrl extends ApiCtrl
         }
         $comment->content = $content;
         if($comment->save()){
-            $this->toJsonItem($comment,['creator']);
+            return $this->toJsonItem($comment,['creator']);
         }else{
             $this->onDBError($comment,'comment save error');
         }

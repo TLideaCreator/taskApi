@@ -17,7 +17,10 @@ class CommentFormat extends TransformerAbstract
     {
         return [
             'id' => $taskComment->id,
-            'creator_id' => $taskComment->creator_d,
+            'creator_id' => $taskComment->creator_id,
+            'content' => $taskComment->content,
+            'created_at' => strtotime($taskComment->created_at),
+            'updated_at' => strtotime($taskComment->updated_at),
             'task_id' => $taskComment->task_id,
         ];
     }

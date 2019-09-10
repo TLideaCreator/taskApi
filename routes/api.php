@@ -32,10 +32,7 @@ $api->version('v1', function ($api) {
         $api->delete('/users/{userId}', 'UserCtrl@deleteUser');
     });
 
-    $api->group(['prefix'=>'projects/{projectId}',  'namespace'=>'App\Http\Controllers\Tasks'],function ($api){
-        $api->get('/tasks/{taskId}/{fileName}','TaskCtrl@getTaskFile');
-        $api->post('/tasks/{taskId}','TaskCtrl@taskUpdateFile');
-    });
+
 
     $api->group(['prefix' => 'projects', 'middleware' => 'auth', 'namespace' => 'App\Http\Controllers\Sprints'], function ($api) {
         $api->get('/{projectId}/sprints', 'SprintCtrl@getProjectSprintList');
@@ -56,7 +53,11 @@ $api->version('v1', function ($api) {
         $api->delete('/tasks/{taskId}/comments/{commentId}', 'TaskCommentCtrl@delTaskComments');
 
     });
-
+    $api->group(['prefix'=>'projects/{projectId}',  'namespace'=>'App\Http\Controllers\Tasks'],function ($api){
+        $api->get('/tasks/{taskId}/{fileName}','TaskCtrl@getTaskFile');
+        $api->delete('/tasks/{taskId}/{fileName}','TaskCtrl@deleteTaskFile');
+        $api->post('/tasks/{taskId}','TaskCtrl@taskUpdateFile');
+    });
     $api->group(['prefix' => 'system', 'middleware' => ['auth', 'sys_auth'], 'namespace' => 'App\Http\Controllers\System'], function ($api) {
         $api->get('statics', 'SystemCtrl@getSystemStatics');
     });

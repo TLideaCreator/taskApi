@@ -287,4 +287,11 @@ class TaskCtrl extends ApiCtrl
             return response(File::get($filePath))->header('Content-Type', 'image/jpeg');
         }
     }
+
+    public function deleteTaskFile($projectId, $taskId, $fileName)
+    {
+        $filePath = $_SERVER['FILE_PATH'].'/projects/'.$projectId.'/tasks/'.$taskId.'/'.$fileName;
+        File::delete($filePath);
+        return 'success';
+    }
 }
