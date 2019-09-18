@@ -100,7 +100,9 @@ $api->version('v1', function ($api) {
         $api->patch('{tempId}/priorities/{priorityId}', 'SystemTempPriorityCtrl@updateSystemTemplatePriority');
         $api->delete('{tempId}/priorities/{priorityId}', 'SystemTempPriorityCtrl@deleteSystemTemplatePriority');
     });
+    $api->group(['prefix'=>'projects/{projectId}/doc', 'middleware'=>['auth', 'project_auth'], 'namespace'=>'App\Http\Controllers\Projects'],function($api){
 
+    });
     $api->group(['prefix' => 'projects/{projectId}', 'middleware' => ['auth', 'project_auth'], 'namespace' => 'App\Http\Controllers\Projects'], function ($api) {
         $api->patch('', 'ProjectCtrl@updateProject');
         $api->delete('', 'ProjectCtrl@removeProject');
