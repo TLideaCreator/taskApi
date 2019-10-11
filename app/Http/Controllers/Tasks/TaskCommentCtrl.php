@@ -59,9 +59,13 @@ class TaskCommentCtrl extends ApiCtrl
 
     public function updateTaskComments(Request $request ,$taskId, $commentId)
     {
+
         $comment = TaskComment::where('id', $commentId)->first();
         if(empty($comment)){
             $this->notFound404('comment');
+        }
+        if($comment->creator_id != $request->user->id){
+            $this->noPermission('no right to update');
         }
         $content = Input::get('content', null);
         if(empty($content)){
@@ -73,12 +77,14 @@ class TaskCommentCtrl extends ApiCtrl
         }else{
             $this->onDBError($comment,'comment save error');
         }
-
     }
 
     public function delTaskComments(Request $request ,$taskId, $commentId)
     {
-        TaskComment::where('id', $commentId)->where('task_id',$taskId)->delete();
+        TaskComment::where('id', $commentId)
+            ->where('task_id',$taskId)
+            ->where('creator_id',$request->user->id)
+            ->delete();
         $comments = TaskComment::where('task_id', $taskId)->get();
         return $this->toJsonArray($comments, ['creator']);
     }
