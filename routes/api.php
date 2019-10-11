@@ -34,6 +34,10 @@ $api->version('v1', function ($api) {
 
     $api->group(['prefix'=>'projects' , 'middleware'=> ['auth','project_auth'], 'namespace'=>'App\Http\Controllers\Projects'], function($api){
         $api->get('/{projectId}/docs', 'ProjectDocCtrl@getProjectDocsCatalog');
+        $api->post('/{projectId}/docs', 'ProjectDocCtrl@createProjectDocs');
+        $api->get('/{projectId}/docs/{fileId}', 'ProjectDocCtrl@getProjectDocContent');
+        $api->patch('/{projectId}/docs/{fileId}', 'ProjectDocCtrl@updateProjectDocContent');
+        $api->delete('/{projectId}/docs/{fileId}', 'ProjectDocCtrl@deleteProjectDocContent');
     });
 
 

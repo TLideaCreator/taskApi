@@ -73,6 +73,11 @@ abstract class ApiCtrl extends Controller
         abort(403,$_ENV['APP_DEBUG']=='true'? $msg: null);
     }
 
+    public function dataAlreadyExist($msg)
+    {
+        abort(205,$_ENV['APP_DEBUG']=='true'? $msg: null);
+    }
+
     public function onDBError($obj,$msg)
     {
         \Log::error("db error {$msg} : ".json_encode($obj) );
