@@ -32,16 +32,20 @@ $api->version('v1', function ($api) {
         $api->delete('/users/{userId}', 'UserCtrl@deleteUser');
     });
 
+    $api->group(['prefix'=>'projects' , 'middleware'=> ['auth','project_auth'], 'namespace'=>'App\Http\Controllers\Projects'], function($api){
+        $api->get('/{projectId}/docs', 'ProjectDocCtrl@getProjectDocsCatalog');
+    });
 
 
-    $api->group(['prefix' => 'projects', 'middleware' => 'auth', 'namespace' => 'App\Http\Controllers\Sprints'], function ($api) {
+
+    $api->group(['prefix' => 'projects', 'middleware' => ['auth','project_auth'], 'namespace' => 'App\Http\Controllers\Sprints'], function ($api) {
         $api->get('/{projectId}/sprints', 'SprintCtrl@getProjectSprintList');
         $api->post('/{projectId}/sprints', 'SprintCtrl@createSprints');
         $api->post('/sprints/{sprintId}/implementation', 'SprintCtrl@makeSprintsActive');
         $api->patch('/sprints/{sprintId}/finish', 'SprintCtrl@makeSprintsFinish');
     });
 
-    $api->group(['prefix' => 'projects/sprints', 'middleware' => 'auth', 'namespace' => 'App\Http\Controllers\Tasks'], function ($api) {
+    $api->group(['prefix' => 'projects/sprints', 'middleware' => ['auth','project_auth'], 'namespace' => 'App\Http\Controllers\Tasks'], function ($api) {
         $api->get('/tasks/{taskId}', 'TaskCtrl@getTaskDetail');
         $api->patch('/tasks/{taskId}', 'TaskCtrl@updateTask');
         $api->post('/{sprintId}/tasks', 'TaskCtrl@createTask');

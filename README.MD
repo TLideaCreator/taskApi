@@ -46,3 +46,6 @@ php artisan db:seed
 ```
 php -S 127.0.0.1:9090 -t public 
 ```
+
+###### 文件服务器地址
+在.env文件中，FILE_SERVER_NAME为文件服务器域名地址，请自行修改
